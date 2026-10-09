@@ -55,7 +55,55 @@ export default function App() {
               <br />
               com uma <em>conversa.</em>
             </h2>
-            <p>Meus canais de contato estarão disponíveis em breve.</p>
+            <p>Tem um projeto em mente? Preencha os campos abaixo e me conte sua ideia.</p>
+            <form
+              className="contact-form"
+              action="https://formsubmit.co/hauanfeliperibeiro@gmail.com"
+              method="POST"
+            >
+              <input type="hidden" name="_subject" value="Novo contato pelo portfólio — Hauan Felipe" />
+              <input type="hidden" name="_template" value="table" />
+              <div className="contact-form-row">
+                <div className="contact-field">
+                  <label htmlFor="contact-name">Seu nome</label>
+                  <input
+                    id="contact-name"
+                    name="name"
+                    type="text"
+                    autoComplete="name"
+                    placeholder="Como posso te chamar?"
+                    maxLength={120}
+                    required
+                  />
+                </div>
+                <div className="contact-field">
+                  <label htmlFor="contact-email">Seu e-mail</label>
+                  <input
+                    id="contact-email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="voce@exemplo.com"
+                    maxLength={254}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="contact-field">
+                <label htmlFor="contact-message">Sua mensagem</label>
+                <textarea
+                  id="contact-message"
+                  name="message"
+                  placeholder="Conte um pouco sobre o seu projeto e como posso ajudar."
+                  rows={5}
+                  maxLength={5000}
+                  required
+                />
+              </div>
+              <button className="contact-submit" type="submit">
+                Enviar mensagem <span aria-hidden="true">↗</span>
+              </button>
+            </form>
             <a className="back-top" href="#inicio">
               Voltar ao início
             </a>
@@ -63,10 +111,9 @@ export default function App() {
         </main>
         <footer className="footer">
           <a className="wordmark" href="#inicio">
-            hauan<span>felipe</span>
+            Hauan<span>Felipe</span>
             <b>.</b>
           </a>
-          <p>Feito com criatividade, código e café.</p>
           <span>© 2026 Hauan Felipe</span>
         </footer>
       </div>

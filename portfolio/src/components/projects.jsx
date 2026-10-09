@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import pingoDashboard from "../assets/projects/pingo-de-luz/dashboard.png";
 import pingoServicos from "../assets/projects/pingo-de-luz/servicos.png";
@@ -47,6 +47,29 @@ const upcomingProjects = [
 
 export default function Projects() {
   const [showGallery, setShowGallery] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const galleryRef = useRef(null);
+  const activeScreen = pingoScreens[activeIndex];
+
+  useEffect(() => {
+    if (!showGallery) return;
+
+    const dialog = galleryRef.current;
+    const previousOverflow = document.body.style.overflow;
+    dialog.showModal();
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      dialog.close();
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [showGallery]);
+
+  function changeScreen(direction) {
+    setActiveIndex((current) =>
+      (current + direction + pingoScreens.length) % pingoScreens.length
+    );
+  }
 
   return (
     <section
@@ -72,17 +95,16 @@ export default function Projects() {
           <button
             className="project-preview"
             type="button"
-            aria-expanded={showGallery}
+            aria-haspopup="dialog"
             aria-controls="pingo-gallery"
-            aria-label={
-              showGallery
-                ? "Ocultar outras telas do Pingo de Luz"
-                : "Mostrar outras telas do Pingo de Luz"
-            }
-            onClick={() => setShowGallery((current) => !current)}
+            aria-label="Ver imagens do projeto Pingo de Luz"
+            onClick={() => {
+              setActiveIndex(0);
+              setShowGallery(true);
+            }}
           >
             <img src={pingoScreens[0].src} alt={pingoScreens[0].alt} />
-            <span>{showGallery ? "Ocultar telas" : "Ver mais telas"}</span>
+            <span>Ver imagens do projeto ↗</span>
           </button>
           <p className="project-label">PROJETO 01 / SISTEMA DE GESTÃO</p>
           <h3>Pingo de Luz</h3>
@@ -108,31 +130,55 @@ export default function Projects() {
         ))}
       </div>
 
-      {showGallery && (
-        <div className="project-expanded" id="pingo-gallery">
-          <div className="project-expanded-heading">
+      <dialog
+        ref={galleryRef}
+        className="project-dialog"
+        id="pingo-gallery"
+        aria-labelledby="pingo-gallery-title"
+        onCancel={() => setShowGallery(false)}
+        onClose={() => setShowGallery(false)}
+        onClick={(event) => {
+          if (event.target === event.currentTarget) setShowGallery(false);
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+            event.preventDefault();
+            changeScreen(event.key === "ArrowLeft" ? -1 : 1);
+          }
+        }}
+      >
+        <div className="project-dialog-content">
+          <div className="project-dialog-heading">
             <div>
-              <p className="project-label">PINGO DE LUZ / OUTRAS TELAS</p>
-              <h3>O sistema por dentro</h3>
+              <p className="project-label">PROJETO 01 / SISTEMA DE GESTÃO</p>
+              <h3 id="pingo-gallery-title">Pingo de Luz</h3>
             </div>
             <button
               className="project-close"
               type="button"
               onClick={() => setShowGallery(false)}
             >
-              Fechar
+              Fechar ×
             </button>
           </div>
-          <div className="project-gallery">
-            {pingoScreens.slice(1).map((screen) => (
-              <figure className="project-shot" key={screen.label}>
-                <img src={screen.src} alt={screen.alt} loading="lazy" />
-                <figcaption>{screen.label}</figcaption>
-              </figure>
-            ))}
+          {showGallery && (
+            <figure className="project-shot">
+              <img src={activeScreen.src} alt={activeScreen.alt} />
+              <figcaption aria-live="polite" aria-atomic="true">
+                {activeScreen.label} · {activeIndex + 1} de {pingoScreens.length}
+              </figcaption>
+            </figure>
+          )}
+          <div className="project-gallery-controls">
+            <button type="button" onClick={() => changeScreen(-1)}>
+              ← Anterior
+            </button>
+            <button type="button" onClick={() => changeScreen(1)}>
+              Próxima →
+            </button>
           </div>
         </div>
-      )}
+      </dialog>
     </section>
   );
 }
